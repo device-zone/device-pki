@@ -1,0 +1,14 @@
+# systemd service for managing all pki certificates autoconfiguration.
+
+[Unit]
+Description=PKI Certificates Configuration Autodiscovery
+
+[Service]
+Type=oneshot
+ExecStart=/bin/bash /usr/libexec/device-autodiscovery/pki-certificates start
+ExecReload=/bin/bash /usr/libexec/device-autodiscovery/pki-certificates reload
+RemainAfterExit=on
+
+[Install]
+WantedBy=multi-user.target
+

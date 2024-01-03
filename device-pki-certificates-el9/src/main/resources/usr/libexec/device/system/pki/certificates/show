@@ -1,0 +1,17 @@
+#!/bin/sh
+
+set -e
+umask 0002
+
+OPTIONS="--show name --fqdn name --show-flags disabled --show-table name,san-dns,san-mail --flag X --polar disabled --fqdn san-dns --address-addrspec san-mail"
+
+if [ "$1" == "--" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+elif [ "$1" == "-c" ]; then
+
+  /usr/libexec/device-set ${OPTIONS} "$@"
+
+fi
+

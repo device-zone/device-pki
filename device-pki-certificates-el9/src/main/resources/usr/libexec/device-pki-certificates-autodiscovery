@@ -1,0 +1,138 @@
+#!/bin/bash
+
+#
+# PKI Certificates Autodiscovery
+# ==============================
+#
+# This script autogenerates the pki certificates config.
+
+set -e
+umask 0007
+
+
+#
+# Handle the cleanup
+# ------------------
+cleanup_before_exit () {
+  if [ -d "${tmpdir}" ]; then
+    rm -rf "${tmpdir}"
+  fi
+}
+# be in a temporay workspace (this works on linux and macosx)
+tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
+# trap catches the exit signal and runs the specified function
+trap cleanup_before_exit EXIT
+# be in our directory
+cd "${tmpdir}"
+
+
+#
+# Per certificate? Run all scripts
+
+run_scripts() {
+
+  request="${1}"
+  instance="${2}"
+
+  logger -t "pki-certificates-autodiscovery" "running autodiscovery for pki certificate ${instance}..."
+
+  rm -f "${line}/warning"
+
+  find "$0.d" -type f -executable | sort | \
+  while read x; do
+    "$x" "${request}" "${instance}" < /dev/null || touch error;
+  done
+
+  if test ! -f "error"; then
+    logger -t "pki-certificates-autodiscovery" "completed autodiscovery for pki certificate ${instance}."
+  else
+    logger -t "pki-certificates-autodiscovery" "failed autodiscovery for pki certificate ${instance}."
+  fi
+
+}
+
+
+#
+# What to do?
+# -----------
+
+request="${1}"
+instance="${2}"
+
+if test -n "${instance}"; then
+  run_scripts "${1}" "${2}"
+  exit 0
+fi
+
+
+
+#
+# Add/remove pki certificates
+
+find /etc/device/system/pki/certificates/ -mindepth 1 -maxdepth 1 -type l | \
+while read line; do
+
+  target=$(readlink -f "$line")
+
+  if test ! -f "$line/name.txt"; then
+    continue;
+  fi
+  instance="$(head $line/name.txt)"
+
+  # remove old instances
+  if test -f "$line/removed"; then
+
+    logger -t pki-certificates-autodiscovery "removing pki certificate ${instance}..."
+
+    systemctl stop "pki-certificate@${instance}"
+
+    logger -t pki-certificates-autodiscovery "removed pki certificate ${instance}."
+
+    # remove folder
+    rm -f "${target}"/*
+    rmdir "${target}"
+    rm -f "${line}"
+
+  # add new instances
+  elif test -f "$line/added"; then
+
+    logger -t pki-certificates-autodiscovery "creating pki certificate ${instance}..."
+
+    if test -f "$line/disabled.bin"; then
+
+      systemctl stop "pki-certificate@${instance}"
+
+    else
+
+      systemctl start "pki-certificate@${instance}"
+
+    fi
+
+    logger -t pki-certificates-autodiscovery "created pki certificate ${instance}."
+
+    rm -f "$line/added"
+
+  # update instances
+  elif test -f "$line/updated"; then
+
+    logger -t pki-certificates-autodiscovery "updating pki certificate ${instance}..."
+
+    if test -f "$line/disabled.bin"; then
+
+      systemctl stop "pki-certificate@${instance}"
+
+    else
+
+      systemctl reload-or-restart "pki-certificate@${instance}"
+
+    fi
+
+    logger -t pki-certificates-autodiscovery "updated pki certificate ${instance}."
+
+    rm -f "$line/updated"
+
+  fi
+
+done
+
+
