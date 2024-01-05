@@ -3,7 +3,7 @@
 set -e
 umask 0002
 
-OPTIONS="--show name --fqdn name --show-flags disabled --show-table name,san-dns,san-mail --flag X --polar disabled --fqdn san-dns --address-addrspec san-mail"
+OPTIONS="--show name --fqdn name --show-flags disabled --show-table name,filter-dns,filter-mail,filter-ca-cert --flag X --polar disabled --fqdn filter-dns --address-addrspec filter-mail --symlink-base /etc/pki/tls/certs --symlink-suffix .crt --symlink filter-ca-cert"
 
 if [ "$1" == "--" ]; then
 

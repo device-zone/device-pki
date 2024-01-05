@@ -32,21 +32,21 @@ cd "${tmpdir}"
 run_scripts() {
 
   request="${1}"
-  instance="${2}"
+  uuid="${2}"
 
-  logger -t "pki-certificates-autodiscovery" "running autodiscovery for pki certificate ${instance}..."
+  logger -t "pki-certificates-autodiscovery" "running autodiscovery for pki certificate ${uuid}..."
 
   rm -f "${line}/warning"
 
   find "$0.d" -type f -executable | sort | \
   while read x; do
-    "$x" "${request}" "${instance}" < /dev/null || touch error;
+    "$x" "${request}" "${uuid}" < /dev/null || touch error;
   done
 
   if test ! -f "error"; then
-    logger -t "pki-certificates-autodiscovery" "completed autodiscovery for pki certificate ${instance}."
+    logger -t "pki-certificates-autodiscovery" "completed autodiscovery for pki certificate ${uuid}."
   else
-    logger -t "pki-certificates-autodiscovery" "failed autodiscovery for pki certificate ${instance}."
+    logger -t "pki-certificates-autodiscovery" "failed autodiscovery for pki certificate ${uuid}."
   fi
 
 }
@@ -57,9 +57,9 @@ run_scripts() {
 # -----------
 
 request="${1}"
-instance="${2}"
+uuid="${2}"
 
-if test -n "${instance}"; then
+if test -n "${uuid}"; then
   run_scripts "${1}" "${2}"
   exit 0
 fi
@@ -78,15 +78,17 @@ while read line; do
     continue;
   fi
   instance="$(head $line/name.txt)"
+  uuid=$(basename $target)
 
   # remove old instances
   if test -f "$line/removed"; then
 
-    logger -t pki-certificates-autodiscovery "removing pki certificate ${instance}..."
+    logger -t pki-certificates-autodiscovery "removing pki certificate ${instance} (${uuid})..."
 
-    systemctl stop "pki-certificate@${instance}"
+    systemctl disable "pki-certificate@${uuid}"
+    systemctl stop "pki-certificate@${uuid}"
 
-    logger -t pki-certificates-autodiscovery "removed pki certificate ${instance}."
+    logger -t pki-certificates-autodiscovery "removed pki certificate ${instance} (${uuid})."
 
     # remove folder
     rm -f "${target}"/*
@@ -96,38 +98,42 @@ while read line; do
   # add new instances
   elif test -f "$line/added"; then
 
-    logger -t pki-certificates-autodiscovery "creating pki certificate ${instance}..."
+    logger -t pki-certificates-autodiscovery "creating pki certificate ${instance} (${uuid})..."
 
     if test -f "$line/disabled.bin"; then
 
-      systemctl stop "pki-certificate@${instance}"
+      systemctl disable "pki-certificate@${uuid}"
+      systemctl stop "pki-certificate@${uuid}"
 
     else
 
-      systemctl start "pki-certificate@${instance}"
+      systemctl enable "pki-certificate@${uuid}"
+      systemctl start "pki-certificate@${uuid}"
 
     fi
 
-    logger -t pki-certificates-autodiscovery "created pki certificate ${instance}."
+    logger -t pki-certificates-autodiscovery "created pki certificate ${uuid}."
 
     rm -f "$line/added"
 
   # update instances
   elif test -f "$line/updated"; then
 
-    logger -t pki-certificates-autodiscovery "updating pki certificate ${instance}..."
+    logger -t pki-certificates-autodiscovery "updating pki certificate ${uuid} (${uuid})..."
 
     if test -f "$line/disabled.bin"; then
 
-      systemctl stop "pki-certificate@${instance}"
+      systemctl disable "pki-certificate@${uuid}"
+      systemctl stop "pki-certificate@${uuid}"
 
     else
 
-      systemctl reload-or-restart "pki-certificate@${instance}"
+      systemctl enable "pki-certificate@${uuid}"
+      systemctl reload-or-restart "pki-certificate@${uuid}"
 
     fi
 
-    logger -t pki-certificates-autodiscovery "updated pki certificate ${instance}."
+    logger -t pki-certificates-autodiscovery "updated pki certificate ${instance} (${uuid})."
 
     rm -f "$line/updated"
 
