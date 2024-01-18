@@ -9,6 +9,7 @@
 set -e
 umask 0007
 
+exec 2> >(logger -t ${0})
 
 #
 # Handle the cleanup
@@ -24,6 +25,63 @@ tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
 trap cleanup_before_exit EXIT
 # be in our directory
 cd "${tmpdir}"
+
+
+find_certificate() {
+
+request="${1}"
+uuid="${2}"
+
+#
+# Configure certs/keys
+
+if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "restart"; then
+
+  logger -t pki-certificate@${uuid} "${request}ing certificate/key..."
+
+  install -m 700 -d /run/pki-certificate
+
+  line="/etc/device/system/pki/certificates/${uuid}"
+
+  if test -f "$line/filter-dns.txt"; then
+    filter+=" --filter-hostname=$(head -n 1 $line/filter-dns.txt)"
+  fi
+  if test -f "$line/filter-mail.txt"; then
+    filter+=" --filter-email=$(head -n 1 $line/filter-mail.txt)"
+  fi
+  if test -z "${filter}"; then
+    filter+=" --filter-hostname=$(hostname -f)"
+  fi
+  if test -L "$line/filter-ca-cert.crt"; then
+    pem+=" --pem-in=$line/filter-ca-cert.crt"
+  fi
+
+  rm -f "/run/pki-certificate/certificate-${uuid}.pem"
+  rm -f "/run/pki-certificate/certificate-${uuid}.yaml"
+
+  redwax-tool ${pem} \
+              --pem-in="/etc/pki/tls/private/*" \
+              --pem-in="/etc/pki/tls/certs/*.pem" \
+              --filter=verify ${filter} \
+              --filter-current \
+              --group-out=postgres \
+	      --cert-out --chain-out --key-out \
+              --pem-out="/run/pki-certificate/certificate-${uuid}.pem" \
+              --format-out=yaml \
+              --metadata-out="/run/pki-certificate/certificate-${uuid}.yaml"
+
+  logger -t pki-certificate@${uuid} "${request}ed certificate/key."
+
+elif test "${request}" == "stop"; then
+
+  rm -f "/run/pki-certificate/certificate-${uuid}.pem"
+  rm -f "/run/pki-certificate/certificate-${uuid}.yaml"
+
+fi
+
+
+
+}
 
 
 #
@@ -60,6 +118,7 @@ request="${1}"
 uuid="${2}"
 
 if test -n "${uuid}"; then
+  find_certificate "${1}" "${2}"
   run_scripts "${1}" "${2}"
   exit 0
 fi
