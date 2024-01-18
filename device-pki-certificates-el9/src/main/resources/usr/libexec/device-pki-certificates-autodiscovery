@@ -7,7 +7,7 @@
 # This script autogenerates the pki certificates config.
 
 set -e
-umask 0007
+umask 0077
 
 exec 2> >(logger -t ${0})
 
@@ -53,7 +53,7 @@ if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "
     filter+=" --filter-hostname=$(hostname -f)"
   fi
   if test -L "$line/filter-ca-cert.crt"; then
-    pem+=" --pem-in=$line/filter-ca-cert.crt"
+    pem+=" --trust-pem-in=$line/filter-ca-cert.crt"
   fi
 
   rm -f "/run/pki-certificate/certificate-${uuid}.pem"
@@ -63,8 +63,7 @@ if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "
               --pem-in="/etc/pki/tls/private/*" \
               --pem-in="/etc/pki/tls/certs/*.pem" \
               --filter=verify ${filter} \
-              --filter-current \
-              --group-out=postgres \
+              --filter-current --filter-expiry=ignore \
 	      --cert-out --chain-out --key-out \
               --pem-out="/run/pki-certificate/certificate-${uuid}.pem" \
               --format-out=yaml \

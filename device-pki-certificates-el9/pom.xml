@@ -172,7 +172,7 @@
             <fileEncoding>utf-8</fileEncoding>
           </preremoveScriptlet>
           <requires>
-            <require>redwax-tool</require>
+            <require>redwax-tool &gt;= 0.9.4</require>
             <require>device</require>
           </requires>
         </configuration>
