@@ -4,9 +4,10 @@
 Description=PKI Certificate Configuration Autodiscovery - %i
 
 [Service]
-Type=oneshot
+Type=simple
 ExecStart=/bin/bash /usr/libexec/device-autodiscovery/pki-certificates start %i
 ExecReload=/bin/bash /usr/libexec/device-autodiscovery/pki-certificates reload %i
+ExecStop=/bin/bash /usr/libexec/device-autodiscovery/pki-certificates stop %i
 RemainAfterExit=on
 
 [Install]
