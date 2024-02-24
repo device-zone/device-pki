@@ -155,9 +155,6 @@
                   <location>target/classes/usr/libexec/device/system/pki/certificates/remove</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/libexec/device/system/pki/certificates/rename</location>
-                </source>
-                <source>
                   <location>target/classes/usr/libexec/device/system/pki/certificates/set</location>
                 </source>
                 <source>
