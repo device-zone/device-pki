@@ -49,6 +49,9 @@ if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "
   if test -f "$line/filter-mail.txt"; then
     filter+=" --filter-email=$(head -n 1 $line/filter-mail.txt)"
   fi
+  if test -f "$line/filter-purpose"; then
+    filter+=" --filter-purpose=$(head -n 1 $line/filter-purpose)"
+  fi
   if test -z "${filter}"; then
     filter+=" --filter-hostname=$(hostname -f)"
   fi

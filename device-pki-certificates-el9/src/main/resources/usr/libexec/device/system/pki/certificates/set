@@ -3,7 +3,13 @@
 set -e
 umask 0002
 
-OPTIONS="--rename name --fqdn name --polar disabled --fqdn filter-dns --address-addrspec filter-mail --required --symlink-base /etc/pki/tls/certs --symlink-suffix .crt --symlink filter-ca-cert"
+OPTIONS="--rename name --fqdn name \
+         --polar disabled \
+         --fqdn filter-dns \
+         --address-addrspec filter-mail \
+         --default any --symlink-base /usr/share/device/system/pki/certificates/filter-purpose --symlink filter-purpose \
+         --required \
+         --symlink-base /etc/pki/tls/certs --symlink-suffix .crt --symlink filter-ca-cert"
 
 if [ "$1" == "--" ]; then
 

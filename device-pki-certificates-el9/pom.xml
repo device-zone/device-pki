@@ -162,6 +162,28 @@
                 </source>
               </sources>
             </mapping>
+            <mapping>
+              <directory>/usr/share/device/system/pki/certificates/filter-purpose</directory>
+              <directoryIncluded>true</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+            </mapping>
+            <mapping>
+              <directory>/usr/share/device/system/pki/certificates/filter-purpose</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/share/device/system/pki/certificates/filter-purpose/sslclient</location>
+                </source>
+                <source>
+                  <location>target/classes/usr/share/device/system/pki/certificates/filter-purpose/sslserver</location>
+                </source>
+              </sources>
+            </mapping>
           </mappings>
           <postinstallScriptlet>
             <scriptFile>target/classes/postinstall</scriptFile>
@@ -172,7 +194,7 @@
             <fileEncoding>utf-8</fileEncoding>
           </preremoveScriptlet>
           <requires>
-            <require>redwax-tool &gt;= 0.9.4</require>
+            <require>redwax-tool &gt;= 0.9.7</require>
             <require>device</require>
           </requires>
         </configuration>
