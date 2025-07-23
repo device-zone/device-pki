@@ -4,9 +4,12 @@ set -e
 umask 0002
 
 OPTIONS="--show name --fqdn name \
-         --show-flags disabled --show-table name,filter-dns,filter-mail,filter-ca-cert --flag X \
-         --polar disabled \
-         --fqdn filter-dns \
+         --show-flags disabled,status --show-table name,filter-dns,filter-mail,filter-ca-cert \
+	 --flag X --polar disabled \
+         --flag 🔒 --flag-description certificate --flag-match Certificate \
+	 --flag 🔑 --flag-description key --flag-match Key \
+	 --systemd-parameter StatusText --systemd-prefix pki-certificate@ --systemd-service status \
+	 --fqdn filter-dns \
          --address-addrspec filter-mail \
          --default any --symlink-base /usr/share/device/system/pki/certificates/filter-purpose/ --symlink filter-purpose \
          --required \

@@ -9,7 +9,6 @@
 set -e
 umask 0077
 
-exec 2> >(logger -t ${0})
 
 #
 # Handle the cleanup
@@ -25,6 +24,8 @@ tmpdir=`mktemp -d 2>/dev/null || mktemp -d -t 'tmpdir'`
 trap cleanup_before_exit EXIT
 # be in our directory
 cd "${tmpdir}"
+
+systemd-notify --ready
 
 
 find_certificate() {
@@ -62,6 +63,8 @@ if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "
   rm -f "/run/pki-certificate/certificate-${uuid}.pem"
   rm -f "/run/pki-certificate/certificate-${uuid}.yaml"
 
+  read status <<<$( \
+
   redwax-tool ${pem} \
               --pem-in="/etc/pki/tls/private/*" \
               --pem-in="/etc/pki/tls/certs/*.pem" \
@@ -70,7 +73,28 @@ if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "
 	      --cert-out --chain-out --key-out \
               --pem-out="/run/pki-certificate/certificate-${uuid}.pem" \
               --format-out=yaml \
-              --metadata-out="/run/pki-certificate/certificate-${uuid}.yaml"
+              --metadata-out="/run/pki-certificate/certificate-${uuid}.yaml" \
+              --format-out json \
+	      --metadata-out - | \
+
+  jq -r '
+. |
+(
+if ( (.Keys | length) > 0 and (.Certificates | length) > 0) then "[Certificate][Key]" else empty end,
+if ( (.Keys | length) == 0 and (.Certificates | length) > 0) then "[Certificate]" else empty end,
+if ( (.Keys | length) == 0 and (.Certificates | length) == 0) then "" else empty end
+)
++
+( .Certificates[] |
+if ( .Data.Validity.Error != null ) then "[Error] " + .Data.Validity.Error else empty end,
+if ( .Data.Validity.Warning != null ) then "[Warning] " + .Data.Validity.Warning else empty end,
+if ( .Data.Validity.Status != null ) then " " + .Data.Validity.Status else empty end
+) // "[Error] " + "No certificate matched"
+  ' \
+
+  )
+
+  systemd-notify --status "$status"
 
   logger -t pki-certificate@${uuid} "${request}ed certificate/key."
 
