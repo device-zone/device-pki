@@ -7,7 +7,7 @@ OPTIONS="--add name --fqdn name \
 	 --polar disabled \
 	 --fqdn filter-dns \
 	 --address-addrspec filter-mail \
-	 --default any --symlink-base /usr/share/device/system/pki/certificates/filter-purpose/ --symlink filter-purpose \
+	 --default any --symlink-base /usr/share/device/state/system/pki/certificates/filter-purpose/ --symlink filter-purpose \
 	 --required \
 	 --symlink-base /etc/pki/tls/certs --symlink-suffix .crt --symlink filter-ca-cert"
 

@@ -11,7 +11,7 @@ OPTIONS="--show name --fqdn name \
 	 --systemd-parameter StatusText --systemd-prefix pki-certificate@ --systemd-service status \
 	 --fqdn filter-dns \
          --address-addrspec filter-mail \
-         --default any --symlink-base /usr/share/device/system/pki/certificates/filter-purpose/ --symlink filter-purpose \
+         --default any --symlink-base /usr/share/device/state/system/pki/certificates/filter-purpose/ --symlink filter-purpose \
          --required \
          --symlink-base /etc/pki/tls/certs --symlink-suffix .crt --symlink filter-ca-cert"
 
