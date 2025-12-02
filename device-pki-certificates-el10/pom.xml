@@ -108,20 +108,20 @@
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device-autodiscovery</directory>
+              <directory>/usr/libexec/device/autodiscovery</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/libexec/device-pki-certificates-autodiscovery</location>
+                  <location>target/classes/usr/libexec/device/autodiscovery/pki-certificates</location>
                   <destination>pki-certificates</destination>
                 </source>
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device-autodiscovery/pki-certificates.d</directory>
+              <directory>/usr/libexec/device/autodiscovery/pki-certificates.d</directory>
               <directoryIncluded>true</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>       
@@ -135,52 +135,52 @@
               <groupname>device</groupname>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device/system/pki/certificates</directory>
+              <directory>/usr/libexec/device/state/system/pki/certificates</directory>
               <directoryIncluded>true</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
             </mapping>
             <mapping>
-              <directory>/usr/libexec/device/system/pki/certificates</directory>
+              <directory>/usr/libexec/device/state/system/pki/certificates</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/libexec/device/system/pki/certificates/add</location>
+                  <location>target/classes/usr/libexec/device/state/system/pki/certificates/add</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/libexec/device/system/pki/certificates/remove</location>
+                  <location>target/classes/usr/libexec/device/state/system/pki/certificates/remove</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/libexec/device/system/pki/certificates/set</location>
+                  <location>target/classes/usr/libexec/device/state/system/pki/certificates/set</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/libexec/device/system/pki/certificates/show</location>
+                  <location>target/classes/usr/libexec/device/state/system/pki/certificates/show</location>
                 </source>
               </sources>
             </mapping>
             <mapping>
-              <directory>/usr/share/device/system/pki/certificates/filter-purpose</directory>
+              <directory>/usr/share/device/state/system/pki/certificates/filter-purpose</directory>
               <directoryIncluded>true</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
             </mapping>
             <mapping>
-              <directory>/usr/share/device/system/pki/certificates/filter-purpose</directory>
+              <directory>/usr/share/device/state/system/pki/certificates/filter-purpose</directory>
               <directoryIncluded>false</directoryIncluded>
               <filemode>755</filemode>
               <username>root</username>
               <groupname>root</groupname>
               <sources>
                 <source>
-                  <location>target/classes/usr/share/device/system/pki/certificates/filter-purpose/sslclient</location>
+                  <location>target/classes/usr/share/device/state/system/pki/certificates/filter-purpose/sslclient</location>
                 </source>
                 <source>
-                  <location>target/classes/usr/share/device/system/pki/certificates/filter-purpose/sslserver</location>
+                  <location>target/classes/usr/share/device/state/system/pki/certificates/filter-purpose/sslserver</location>
                 </source>
               </sources>
             </mapping>
