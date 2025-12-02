@@ -1,0 +1,88 @@
+#!/bin/sh
+
+#
+# PKI Certificates Autodiscovery
+# ==============================
+#
+# This script finds each certificate
+
+set -e
+umask 0077
+
+request="${1}"
+uuid="${2}"
+
+systemd-notify --ready
+
+
+if test "${request}" == "start" -o "${request}" == "reload" -o "${request}" == "restart"; then
+
+  logger -t pki-certificate@${uuid} "${request}ing certificate/key..."
+
+  install -m 700 -d /run/pki-certificate
+
+  line="/etc/device/system/pki/certificates/${uuid}"
+
+  if test -f "$line/filter-dns.txt"; then
+    filter+=" --filter-hostname=$(head -n 1 $line/filter-dns.txt)"
+  fi
+  if test -f "$line/filter-mail.txt"; then
+    filter+=" --filter-email=$(head -n 1 $line/filter-mail.txt)"
+  fi
+  if test -f "$line/filter-purpose"; then
+    filter+=" --filter-purpose=$(head -n 1 $line/filter-purpose)"
+  fi
+  if test -z "${filter}"; then
+    filter+=" --filter-hostname=$(hostname -f)"
+  fi
+  if test -L "$line/filter-ca-cert.crt"; then
+    pem+=" --trust-pem-in=$line/filter-ca-cert.crt"
+  fi
+
+  rm -f "/run/pki-certificate/certificate-${uuid}.pem"
+  rm -f "/run/pki-certificate/certificate-${uuid}.yaml"
+
+  read status <<<$( \
+
+  redwax-tool ${pem} \
+              --pem-in="/etc/pki/tls/private/*" \
+              --pem-in="/etc/pki/tls/certs/*.pem" \
+              --filter=verify ${filter} \
+              --filter-current --filter-expiry=ignore \
+              --cert-out --chain-out --key-out \
+              --pem-out="/run/pki-certificate/certificate-${uuid}.pem" \
+              --format-out=yaml \
+              --metadata-out="/run/pki-certificate/certificate-${uuid}.yaml" \
+              --format-out json \
+              --metadata-out - | \
+
+  jq -r '
+. |
+(
+if ( (.Keys | length) > 0 and (.Certificates | length) > 0) then "[Certificate][Key]" else empty end,
+if ( (.Keys | length) == 0 and (.Certificates | length) > 0) then "[Certificate]" else empty end,
+if ( (.Keys | length) == 0 and (.Certificates | length) == 0) then "" else empty end
+)
++
+( .Certificates[] |
+if ( .Data.Validity.Error != null ) then "[Error] " + .Data.Validity.Error else empty end,
+if ( .Data.Validity.Warning != null ) then "[Warning] " + .Data.Validity.Warning else empty end,
+if ( .Data.Validity.Status != null ) then " " + .Data.Validity.Status else empty end
+) // "[Error] " + "No certificate matched"
+  ' \
+
+  )
+
+  systemd-notify --status "$status"
+
+  logger -t pki-certificate@${uuid} "${request}ed certificate/key."
+
+elif test "${request}" == "stop"; then
+
+  rm -f "/run/pki-certificate/certificate-${uuid}.pem"
+  rm -f "/run/pki-certificate/certificate-${uuid}.yaml"
+
+fi
+
+
+

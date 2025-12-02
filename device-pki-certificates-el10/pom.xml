@@ -128,6 +128,19 @@
               <groupname>root</groupname>
             </mapping> 
             <mapping>
+              <directory>/usr/libexec/device/autodiscovery/pki-certificates.d</directory>
+              <directoryIncluded>false</directoryIncluded>
+              <filemode>755</filemode>
+              <username>root</username>
+              <groupname>root</groupname>
+              <sources>
+                <source>
+                  <location>target/classes/usr/libexec/device/autodiscovery/pki-certificates.d/find-certificates</location>
+                  <destination>00-find-certificates</destination>
+                </source>
+              </sources>
+            </mapping>
+            <mapping>
               <directory>/etc/device/system/pki/certificates</directory>
               <directoryIncluded>true</directoryIncluded>
               <filemode>2775</filemode>
@@ -195,6 +208,7 @@
           </preremoveScriptlet>
           <requires>
             <require>redwax-tool &gt;= 1.0.0</require>
+            <require>sequence</require>
             <require>device &gt;= 1.0.0</require>
           </requires>
         </configuration>
