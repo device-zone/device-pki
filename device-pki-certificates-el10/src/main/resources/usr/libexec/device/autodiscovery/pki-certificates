@@ -166,7 +166,7 @@ while read line; do
   uuid=$(basename $target)
 
   # remove old instances
-  if test -f "$line/removed"; then
+  if test -f "$line/.removed"; then
 
     logger -t pki-certificates-autodiscovery "removing pki certificate ${instance} (${uuid})..."
 
@@ -181,7 +181,7 @@ while read line; do
     rm -f "${line}"
 
   # add new instances
-  elif test -f "$line/added"; then
+  elif test -f "$line/.added"; then
 
     logger -t pki-certificates-autodiscovery "creating pki certificate ${instance} (${uuid})..."
 
@@ -199,10 +199,10 @@ while read line; do
 
     logger -t pki-certificates-autodiscovery "created pki certificate ${uuid}."
 
-    rm -f "$line/added"
+    rm -f "$line/.added"
 
   # update instances
-  elif test -f "$line/updated"; then
+  elif test -f "$line/.updated"; then
 
     logger -t pki-certificates-autodiscovery "updating pki certificate ${uuid} (${uuid})..."
 
@@ -220,7 +220,7 @@ while read line; do
 
     logger -t pki-certificates-autodiscovery "updated pki certificate ${instance} (${uuid})."
 
-    rm -f "$line/updated"
+    rm -f "$line/.updated"
 
   fi
 
