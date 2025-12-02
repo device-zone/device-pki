@@ -5,8 +5,8 @@ Description=PKI Certificates Configuration Autodiscovery
 
 [Service]
 Type=notify
-ExecStart=/usr/libexec/device-autodiscovery/pki-certificates start
-ExecReload=/usr/libexec/device-autodiscovery/pki-certificates reload
+ExecStart=/usr/libexec/device/autodiscovery/pki-certificates start
+ExecReload=/usr/libexec/device/autodiscovery/pki-certificates reload
 RemainAfterExit=on
 
 [Install]
