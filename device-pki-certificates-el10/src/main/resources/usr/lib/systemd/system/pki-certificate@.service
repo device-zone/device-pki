@@ -5,9 +5,9 @@ Description=PKI Certificate Configuration Autodiscovery - %i
 
 [Service]
 Type=notify
-ExecStart=/usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d start %i
-ExecReload=/usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d reload %i
-ExecStop=/usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d stop %i
+ExecStart=/usr/bin/flock -s /etc/device/system/pki/certificates/ /usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d start %i
+ExecReload=/usr/bin/flock -s /etc/device/system/pki/certificates/ /usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d reload %i
+ExecStop=/usr/bin/flock -s /etc/device/system/pki/certificates/ /usr/bin/sequence -s daemon.info -b /usr/libexec device/autodiscovery/pki-certificates.d stop %i
 RemainAfterExit=on
 
 [Install]
