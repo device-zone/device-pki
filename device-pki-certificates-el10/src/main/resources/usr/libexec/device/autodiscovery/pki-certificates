@@ -47,7 +47,7 @@ while read line; do
 
     logger -t pki-certificates-autodiscovery "creating pki certificate ${instance} (${uuid})..."
 
-    if test -f "$line/disabled.bin"; then
+    if test -f "$line/disabled.polar"; then
 
       systemctl disable "pki-certificate@${uuid}"
       systemctl stop "pki-certificate@${uuid}"
@@ -68,7 +68,7 @@ while read line; do
 
     logger -t pki-certificates-autodiscovery "updating pki certificate ${uuid} (${uuid})..."
 
-    if test -f "$line/disabled.bin"; then
+    if test -f "$line/disabled.polar"; then
 
       systemctl disable "pki-certificate@${uuid}"
       systemctl stop "pki-certificate@${uuid}"
